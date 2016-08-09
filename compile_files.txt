@@ -1,0 +1,13 @@
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/utils/punycode.js
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/utils/common.js
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/utils/url.js
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/utils/log.js
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/utils/local-script-rules.js
+
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/filter/rules/base-filter-rule.js
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/filter/rules/filter-rule-builder.js
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/filter/rules/css-filter-rule.js
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/filter/rules/script-filter-rule.js
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/filter/rules/url-filter-rule.js
+
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/browser/safari/lib/converter.js
