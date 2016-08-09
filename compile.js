@@ -1,3 +1,5 @@
+Array.prototype.each = Array.prototype.forEach;
+
 var NodeUglifier = require("node-uglifier");
 var nodeUglifier = new NodeUglifier("./JSConverter.js");
 nodeUglifier.merge();//.uglify();
