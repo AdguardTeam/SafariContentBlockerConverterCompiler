@@ -1,0 +1,6 @@
+.idea/
+.vscode/
+.jshintrc
+*.iml
+tags
+node_modules
