@@ -3,6 +3,12 @@
 For iOS version of Adguard we need a js rules converter compiled to one single file.
 So this utility scripts will donwload required files from AdguardBrowserExtension repository and then build one js file out of it.
 
+###Requirements
+
+- Node 
+- NPM
+- node-uglifier (npm install "node-uglifier")
+
 ###Building
 
 Run the following command in the Compiler directory:
