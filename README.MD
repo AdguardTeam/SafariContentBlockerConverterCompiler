@@ -20,7 +20,7 @@ You can find the result JSConverter.js in **./compiled/** directory.
 
 ###Running tests
 
-To check the result run /test/test.html and check browser's console.
+To check the result run **./test/test.html** and check browser's console.
 
 
 
