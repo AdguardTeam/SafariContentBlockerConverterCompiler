@@ -4,6 +4,7 @@ https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Ext
 https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/utils/log.js
 https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/utils/local-script-rules.js
 
+https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/filter/rules/simple-regex.js
 https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/filter/rules/base-filter-rule.js
 https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/filter/rules/filter-rule-builder.js
 https://raw.githubusercontent.com/AdguardTeam/AdguardBrowserExtension/master/Extension/lib/filter/rules/css-filter-rule.js
