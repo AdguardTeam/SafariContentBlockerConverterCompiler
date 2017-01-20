@@ -18,8 +18,13 @@
 /**
  * Extension global preferences
  */
-var Prefs = exports.Prefs = {
-	speedupStartup: function () {
-		return false;
-	}
-};
+
+adguard.prefs = (function (adguard) {
+    var Prefs = {
+        speedupStartup: function () {
+            return false;
+        }
+    };
+
+    return Prefs;
+})(adguard);

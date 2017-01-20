@@ -1,5 +1,3 @@
-var SafariContentBlockerConverter = require('./download/converter.js').SafariContentBlockerConverter;
-
 function jsonFromFilters(rules, limit, optimize){
     try {
         return SafariContentBlockerConverter.convertArray(rules, limit, optimize);
