@@ -7,7 +7,7 @@ So this utility scripts will donwload required files from AdguardBrowserExtensio
 
 - Node 
 - NPM
-- node-uglifier (npm install "node-uglifier")
+- concat-files (npm install concat-files)
 
 ###Building
 
