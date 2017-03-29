@@ -9218,12 +9218,12 @@ adguard.rules = (function () {
 /**
  * Safari content blocking format rules converter.
  */
-var CONVERTER_VERSION = '1.3.25';
+var CONVERTER_VERSION = '1.3.26';
 // Max number of CSS selectors per rule (look at _compactCssRules function)
 var MAX_SELECTORS_PER_WIDE_RULE = 250;
 var ANY_URL_TEMPLATES = ['||*', '', '*', '|*'];
 var URL_FILTER_ANY_URL = ".*";
-var URL_FILTER_WS_ANY_URL = "|ws*://*";
+var URL_FILTER_WS_ANY_URL = "^wss?://.*";
 // Improved regular expression instead of UrlFilterRule.REGEXP_START_URL
 var URL_FILTER_REGEXP_START_URL = "^https?://([^/]*\\.)?";
 // Simplified separator (to fix an issue with $ restriction - it can be only in the end of regexp)
