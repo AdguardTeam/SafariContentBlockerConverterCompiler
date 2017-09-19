@@ -688,11 +688,13 @@ adguard.RequestTypes = {
     OBJECT: "OBJECT",
     IMAGE: "IMAGE",
     XMLHTTPREQUEST: "XMLHTTPREQUEST",
-    OBJECT_SUBREQUEST: "OBJECT-SUBREQUEST",
+    OBJECT_SUBREQUEST: "OBJECT_SUBREQUEST",
     MEDIA: "MEDIA",
     FONT: "FONT",
     WEBSOCKET: "WEBSOCKET",
+    WEBRTC: "WEBRTC",
     OTHER: "OTHER",
+    CSP: "CSP",
 
     /**
      * Synthetic request type for requests detected as pop-ups
@@ -1178,8 +1180,8 @@ adguard.utils = (function () {
             deferred.resolve(arg);
         };
 
-        var reject = function () {
-            deferred.reject();
+        var reject = function (arg) {
+            deferred.reject(arg);
         };
 
         var then = function (onSuccess, onReject) {
@@ -1436,40 +1438,15 @@ adguard.utils.RingBuffer = function (size) { // jshint ignore:line
             return global.punycode.toASCII(domain);
         },
 
-        urlToPunyCode: function (url) {
-
-            if (!url || /^[\x00-\x7F]+$/.test(url)) {
-                return url;
-            }
-
-            var i;
-            var startsWith = ["http://www.", "https://www.", "http://", "https://"];
-            var startIndex = -1;
-
-            for (i = 0; i < startsWith.length; i++) {
-                var start = startsWith[i];
-                if (api.strings.startWith(url, start)) {
-                    startIndex = start.length;
-                    break;
-                }
-            }
-
-            if (startIndex == -1) {
-                return url;
-            }
-
-            var symbolIndex = url.indexOf("/", startIndex);
-            var domain = symbolIndex == -1 ? url.substring(startIndex) : url.substring(startIndex, symbolIndex);
-            return api.strings.replaceAll(url, domain, this.toPunyCode(domain));
-        },
-
         isThirdPartyRequest: function (requestUrl, referrer) {
             var domainName = this._get2NdLevelDomainName(requestUrl);
             var refDomainName = this._get2NdLevelDomainName(referrer);
             return domainName != refDomainName;
         },
 
-        //Get host name
+        /**
+         * Retrieves hostname from URL
+         */
         getHost: function (url) {
 
             if (!url) {
@@ -1477,9 +1454,19 @@ adguard.utils.RingBuffer = function (size) { // jshint ignore:line
             }
 
             var firstIdx = url.indexOf("//");
-            if (firstIdx == -1) {
-                return null;
+            if (firstIdx === -1) {
+                /**
+                 * It's non hierarchical structured URL (e.g. stun: or turn:)
+                 * https://tools.ietf.org/html/rfc4395#section-2.2
+                 * https://tools.ietf.org/html/draft-nandakumar-rtcweb-stun-uri-08#appendix-B
+                 */
+                firstIdx = url.indexOf(":");
+                if (firstIdx === -1) {
+                    return null;
+                }
+                firstIdx = firstIdx - 1;
             }
+
             var nextSlashIdx = url.indexOf("/", firstIdx + 2);
             var startParamsIdx = url.indexOf("?", firstIdx + 2);
 
@@ -1488,10 +1475,10 @@ adguard.utils.RingBuffer = function (size) { // jshint ignore:line
                 lastIdx = startParamsIdx;
             }
 
-            var host = lastIdx == -1 ? url.substring(firstIdx + 2) : url.substring(firstIdx + 2, lastIdx);
+            var host = lastIdx === -1 ? url.substring(firstIdx + 2) : url.substring(firstIdx + 2, lastIdx);
 
             var portIndex = host.indexOf(":");
-            return portIndex == -1 ? host : host.substring(0, portIndex);
+            return portIndex === -1 ? host : host.substring(0, portIndex);
         },
 
         getDomainName: function (url) {
@@ -7996,6 +7983,41 @@ adguard.rules = (function () {
  * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Browser utils
+ */
+(function (adguard, api) {
+    var Utils = {
+        isFirefoxBrowser: function () {
+            return false;
+        },
+        isContentBlockerEnabled: function () {
+            return true;
+        }
+    };
+
+    api.browser = Utils;
+
+})(adguard, adguard.utils);
+
+adguard.rules.CspFilter = adguard.rules.CspFilter || {};
+adguard.rules.CspFilter.DEFAULT_DIRECTIVE = 'connect-src http: https:; frame-src http: https:; child-src http: https:';/**
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 (function (adguard, api) {
 
     'use strict';
@@ -8044,7 +8066,7 @@ adguard.rules = (function () {
                             if (permittedDomains === null) {
                                 permittedDomains = [];
                             }
-                            permittedDomains.push(adguard.utils.url.getCroppedDomainName(domainName));
+                            permittedDomains.push(domainName);
                         }
                     }
                 }
@@ -8343,8 +8365,8 @@ adguard.rules = (function () {
             ":focus", ":hover", ":in-range", ":invalid", ":lang", ":last-child", ":last-of-type",
             ":link", ":not", ":nth-child", ":nth-last-child", ":nth-last-of-type", ":nth-of-type",
             ":only-child", ":only-of-type", ":optional", ":out-of-range", ":read-only",
-            ":read-write", ":required", ":root", ":target", ":valid", ":visited", ":has", ":contains",
-            ":matches-css", ":matches-css-before", ":matches-css-after"];
+            ":read-write", ":required", ":root", ":target", ":valid", ":visited", ":has", ":has-text", ":contains",
+            ":matches-css", ":matches-css-before", ":matches-css-after", ":-abp-has", ":-abp-contains"];
 
         /**
          * The problem with it is that ":has" and ":contains" pseudo classes are not a valid pseudo classes,
@@ -8352,9 +8374,9 @@ adguard.rules = (function () {
          *
          * @type {string[]}
          */
-        var EXTENDED_CSS_MARKERS = ["[-ext-has=", "[-ext-contains=", "[-ext-matches-css=",
-            "[-ext-matches-css-before=", "[-ext-matches-css-after=", ":has(", ":contains(",
-            ":matches-css(", ":matches-css-before(", ":matches-css-after("];
+        var EXTENDED_CSS_MARKERS = ["[-ext-has=", "[-ext-contains=", "[-ext-has-text=", "[-ext-matches-css=",
+            "[-ext-matches-css-before=", "[-ext-matches-css-after=", ":has(", ":has-text(", ":contains(",
+            ":matches-css(", ":matches-css-before(", ":matches-css-after(", ":-abp-has(", ":-abp-contains("];
 
         /**
          * Tries to convert CSS injections rules from uBlock syntax to our own
@@ -8429,7 +8451,7 @@ adguard.rules = (function () {
                 }
             }
 
-            var nameEndIndex = adguard.utils.strings.indexOfAny(selector, nameStartIndex + 1, [' ', '\t', '>', '(', '[', '.', '#', ':', '+', '~']);
+            var nameEndIndex = adguard.utils.strings.indexOfAny(selector, nameStartIndex + 1, [' ', '\t', '>', '(', '[', '.', '#', ':', '+', '~', '"', "'"]);
             if (nameEndIndex < 0) {
                 nameEndIndex = selector.length;
             }
@@ -8597,6 +8619,8 @@ adguard.rules = (function () {
 (function (adguard, api) {
 
     'use strict';
+
+    var isFirefoxBrowser = adguard.utils.browser.isFirefoxBrowser();
 
     /**
      * Searches for domain name in rule text and transforms it to punycode if needed.
@@ -8817,6 +8841,64 @@ adguard.rules = (function () {
     }
 
     /**
+     * Validates CSP rule
+     * @param rule Rule with $CSP modifier
+     */
+    function validateCspRule(rule) {
+
+        /**
+         * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/685
+         * CSP directive may be empty in case of whitelist rule, it means to disable all $csp rules matching the whitelist rule
+         */
+        if (!rule.whiteListRule && !rule.cspDirective) {
+            throw 'Invalid $CSP rule: CSP directive must not be empty';
+        }
+
+        if (rule.cspDirective) {
+
+            /**
+             * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/685#issue-228287090
+             * Forbids report-to and report-uri directives
+             */
+            var cspDirective = rule.cspDirective.toLowerCase();
+            if (cspDirective.indexOf('report-uri') >= 0 ||
+                cspDirective.indexOf('report-to') >= 0) {
+
+                throw 'Forbidden CSP directive: ' + cspDirective;
+            }
+        }
+    }
+
+    /**
+     * Tries to convert data: or blob: rule to CSP rule
+     * @param rule Rule
+     * @param urlRuleText URL rule text
+     */
+    function tryConvertToCspRule(rule, urlRuleText) {
+
+        // Convert only blocking domain-specific rules
+        if (rule.whiteListRule || !rule.hasPermittedDomains()) {
+            return;
+        }
+
+        // Firefox browser allow to intercept data: and blob: URIs
+        if (isFirefoxBrowser) {
+            return;
+        }
+
+        if (urlRuleText.indexOf('data:') === 0 || urlRuleText.indexOf('|data:') === 0 ||
+            urlRuleText.indexOf('blob:') === 0 || urlRuleText.indexOf('|blob:') === 0) {
+
+            rule.cspRule = true;
+            rule.cspDirective = api.CspFilter.DEFAULT_DIRECTIVE;
+
+            rule.urlRegExpSource = UrlFilterRule.MASK_ANY_SYMBOL;
+            rule.shortcut = null;
+            rule.permittedContentType = UrlFilterRule.contentTypes.ALL;
+        }
+    }
+
+    /**
      * Rule for blocking requests to URLs.
      * Read here for details:
      * http://adguard.com/en/filterrules.html#baseRules
@@ -8859,7 +8941,7 @@ adguard.rules = (function () {
                 throw 'Illegal regexp rule';
             }
 
-            if (UrlFilterRule.REGEXP_ANY_SYMBOL == regexp && !this.hasPermittedDomains()) {
+            if (UrlFilterRule.REGEXP_ANY_SYMBOL === regexp && !this.hasPermittedDomains()) {
                 // Rule matches everything and does not have any domain restriction
                 throw ("Too wide basic rule: " + urlRuleText);
             }
@@ -8869,6 +8951,14 @@ adguard.rules = (function () {
         } else {
             // Searching for shortcut
             this.shortcut = findShortcut(urlRuleText);
+        }
+
+        if (!this.cspRule) {
+            tryConvertToCspRule(this, urlRuleText);
+        }
+
+        if (this.cspRule) {
+            validateCspRule(this);
         }
     };
 
@@ -8996,7 +9086,7 @@ adguard.rules = (function () {
             return false;
         }
 
-        if (this.restrictedContentType !== 0 && (this.restrictedContentType & contentTypeMask) == contentTypeMask) { // jshint ignore:line
+        if (this.restrictedContentType !== 0 && (this.restrictedContentType & contentTypeMask) === contentTypeMask) { // jshint ignore:line
             //in restricted list - skip this rule
             return false;
         }
@@ -9066,7 +9156,7 @@ adguard.rules = (function () {
                 case UrlFilterRule.IMPORTANT_OPTION:
                     this.isImportant = true;
                     break;
-                case UrlFilterRule.NOT_MARK + UrlFilterRule.IMPORTANT_OPTION:
+                case api.FilterRule.NOT_MARK + UrlFilterRule.IMPORTANT_OPTION:
                     this.isImportant = false;
                     break;
                 case UrlFilterRule.ELEMHIDE_OPTION:
@@ -9093,14 +9183,34 @@ adguard.rules = (function () {
                 case UrlFilterRule.EMPTY_OPTION:
                     this.emptyResponse = true;
                     break;
+                case UrlFilterRule.CSP_OPTION:
+                    this.cspRule = true;
+                    if (optionsKeyValue.length > 1) {
+                        this.cspDirective = optionsKeyValue[1];
+                    }
+                    break;
                 default:
                     optionName = optionName.toUpperCase();
+
+                    /**
+                     * Convert $object-subrequest modifier to UrlFilterRule.contentTypes.OBJECT_SUBREQUEST
+                     */
+                    if (optionName === 'OBJECT-SUBREQUEST') {
+                        optionName = 'OBJECT_SUBREQUEST';
+                    } else if (optionName === '~OBJECT-SUBREQUEST') {
+                        optionName = '~OBJECT_SUBREQUEST';
+                    }
+
                     if (optionName in UrlFilterRule.contentTypes) {
                         permittedContentType |= UrlFilterRule.contentTypes[optionName]; // jshint ignore:line
-                    } else if (optionName[0] == api.FilterRule.NOT_MARK && optionName.substring(1) in UrlFilterRule.contentTypes) {
+                    } else if (optionName[0] === api.FilterRule.NOT_MARK && optionName.substring(1) in UrlFilterRule.contentTypes) {
                         restrictedContentType |= UrlFilterRule.contentTypes[optionName.substring(1)]; // jshint ignore:line
                     } else if (optionName in UrlFilterRule.ignoreOptions) { // jshint ignore:line
-                        // Ignore
+                        if (optionName === 'CONTENT' && optionsParts.length === 1) {
+                            //https://github.com/AdguardTeam/AdguardBrowserExtension/issues/719
+                            throw 'Single $content option rule is ignored: ' + this.ruleText;
+                        }
+                        // Ignore others
                     } else {
                         throw 'Unknown option: ' + optionName;
                     }
@@ -9132,6 +9242,7 @@ adguard.rules = (function () {
     UrlFilterRule.REGEXP_ANY_SYMBOL = ".*";
     UrlFilterRule.EMPTY_OPTION = "empty";
     UrlFilterRule.REPLACE_OPTION = "replace"; // Extension doesn't support replace rules, $replace option is here only for correctly parsing
+    UrlFilterRule.CSP_OPTION = "csp";
 
     UrlFilterRule.contentTypes = {
 
@@ -9143,10 +9254,12 @@ adguard.rules = (function () {
         OBJECT: 1 << 4,
         SUBDOCUMENT: 1 << 5,
         XMLHTTPREQUEST: 1 << 6,
-        'OBJECT-SUBREQUEST': 1 << 7,
+        OBJECT_SUBREQUEST: 1 << 7,
         MEDIA: 1 << 8,
         FONT: 1 << 9,
         WEBSOCKET: 1 << 10,
+        WEBRTC: 1 << 11,
+        CSP: 1 << 12,
 
         ELEMHIDE: 1 << 20,      //CssFilter cannot be applied to page
         URLBLOCK: 1 << 21,      //This attribute is only for exception rules. If true - do not use urlblocking rules for urls where referrer satisfies this rule.
@@ -9160,9 +9273,9 @@ adguard.rules = (function () {
 
     // https://code.google.com/p/chromium/issues/detail?id=410382
     if (adguard.prefs.platform === 'chromium' ||
-        adguard.prefs.platform == 'webkit') {
+        adguard.prefs.platform === 'webkit') {
 
-        UrlFilterRule.contentTypes['OBJECT-SUBREQUEST'] = UrlFilterRule.contentTypes.OBJECT;
+        UrlFilterRule.contentTypes.OBJECT_SUBREQUEST = UrlFilterRule.contentTypes.OBJECT;
     }
 
     UrlFilterRule.ignoreOptions = {
@@ -9189,10 +9302,11 @@ adguard.rules = (function () {
     UrlFilterRule.contentTypes.ALL |= UrlFilterRule.contentTypes.OBJECT;
     UrlFilterRule.contentTypes.ALL |= UrlFilterRule.contentTypes.SUBDOCUMENT;
     UrlFilterRule.contentTypes.ALL |= UrlFilterRule.contentTypes.XMLHTTPREQUEST;
-    UrlFilterRule.contentTypes.ALL |= UrlFilterRule.contentTypes['OBJECT-SUBREQUEST'];
+    UrlFilterRule.contentTypes.ALL |= UrlFilterRule.contentTypes.OBJECT_SUBREQUEST;
     UrlFilterRule.contentTypes.ALL |= UrlFilterRule.contentTypes.MEDIA;
     UrlFilterRule.contentTypes.ALL |= UrlFilterRule.contentTypes.FONT;
     UrlFilterRule.contentTypes.ALL |= UrlFilterRule.contentTypes.WEBSOCKET;
+    UrlFilterRule.contentTypes.ALL |= UrlFilterRule.contentTypes.WEBRTC;
     // jshint ignore:end
 
     api.UrlFilterRule = UrlFilterRule;
@@ -9218,14 +9332,14 @@ adguard.rules = (function () {
 /**
  * Safari content blocking format rules converter.
  */
-var CONVERTER_VERSION = '1.3.26';
+var CONVERTER_VERSION = '1.3.29';
 // Max number of CSS selectors per rule (look at _compactCssRules function)
 var MAX_SELECTORS_PER_WIDE_RULE = 250;
 var ANY_URL_TEMPLATES = ['||*', '', '*', '|*'];
 var URL_FILTER_ANY_URL = ".*";
 var URL_FILTER_WS_ANY_URL = "^wss?://.*";
 // Improved regular expression instead of UrlFilterRule.REGEXP_START_URL
-var URL_FILTER_REGEXP_START_URL = "^https?://([^/]*\\.)?";
+var URL_FILTER_REGEXP_START_URL = "^[htpsw]+://([^/]*\\.)?";
 // Simplified separator (to fix an issue with $ restriction - it can be only in the end of regexp)
 var URL_FILTER_REGEXP_SEPARATOR = "[/:&?]?";
 
@@ -9360,14 +9474,19 @@ var SafariContentBlockerConverter = {
 
             // Not supported modificators
             if (this._isContentType(rule, UrlFilterRule.contentTypes.OBJECT)) {
-                throw new Error('Object content type is not yet supported');
+                throw new Error('$object content type is not yet supported');
             }
-            if (this._isContentType(rule, UrlFilterRule.contentTypes['OBJECT-SUBREQUEST'])) {
-                throw new Error('Object_subrequest content type is not yet supported');
+            if (this._isContentType(rule, UrlFilterRule.contentTypes.OBJECT_SUBREQUEST)) {
+                throw new Error('$object_subrequest content type is not yet supported');
             }
-
+            if (this._isContentType(rule, UrlFilterRule.contentTypes.WEBRTC)) {
+                throw new Error('$webrtc content type is not yet supported');
+            }
             if (this._isContentType(rule, UrlFilterRule.contentTypes.JSINJECT)) {
                 throw new Error('$jsinject rules are ignored.');
+            }
+            if (rule.cspRule) {
+                throw new Error('$csp content type is not yet supported');
             }
 
             if (types.length > 0) {
@@ -9635,6 +9754,7 @@ var SafariContentBlockerConverter = {
 
     /**
      * Converts ruleText string to Safari format
+     * Used in iOS.
      *
      * @param ruleText string
      * @param errors array
@@ -9642,7 +9762,29 @@ var SafariContentBlockerConverter = {
      */
     convertLine: function (ruleText, errors) {
         try {
-            if (ruleText === null || ruleText === '' || 
+            return this._convertAGRule(this._parseAGRule(ruleText, errors));
+        } catch (ex) {
+            var message = 'Error converting rule from: ' + ruleText + ' cause:\n' + ex;
+            message = ruleText + '\r\n' + message + '\r\n';
+            adguard.console.debug(message);
+
+            if (errors) {
+                errors.push(message);
+            }
+
+            return null;
+        }
+    },
+
+    /**
+     * Creates AG rule form text
+     *
+     * @param ruleText
+     * @param errors
+     */
+    _parseAGRule: function (ruleText, errors) {
+        try {
+            if (ruleText === null || ruleText === '' ||
                 ruleText.indexOf('!') === 0 || ruleText.indexOf(' ') === 0 ||
                 ruleText.indexOf(' - ') > 0) {
                 return null;
@@ -9653,10 +9795,9 @@ var SafariContentBlockerConverter = {
                 throw new Error('Cannot create rule from: ' + ruleText);
             }
 
-            return this._convertAGRule(agRule);
-
+            return agRule;
         } catch (ex) {
-            var message = 'Error converting rule from: ' + ruleText + ' cause:\n' + ex;
+            var message = 'Error creating rule from: ' + ruleText + ' cause:\n' + ex;
             message = ruleText + '\r\n' + message + '\r\n';
             adguard.console.debug(message);
 
@@ -9705,7 +9846,7 @@ var SafariContentBlockerConverter = {
             return this._convertAGRule(rule);
         } catch (ex) {          
             var message = 'Error converting rule from: ' + 
-                (rule.ruleText ? rule.ruleText : rule) + 
+				((rule && rule.ruleText) ? rule.ruleText : rule) +
                 ' cause:\n' + ex + '\r\n';
             adguard.console.debug(message);
 
@@ -9944,12 +10085,16 @@ var SafariContentBlockerConverter = {
 
         for (var i = 0, len = rules.length; i < len; i++) {
             var item;
+            var agRule;
             var ruleText;
+
             if (rules[i] !== null && rules[i].ruleText) {
+                agRule = rules[i];
                 item = this.convertAGRule(rules[i], contentBlocker.errors);
                 ruleText = rules[i].ruleText;
             } else {
-                item = this.convertLine(rules[i], contentBlocker.errors);
+                agRule = this._parseAGRule(rules[i], contentBlocker.errors);
+                item = this.convertAGRule(agRule, contentBlocker.errors);
                 ruleText = rules[i];
             }
 
@@ -9966,13 +10111,11 @@ var SafariContentBlockerConverter = {
                     (item.action.selector && item.action.selector !== '')) {
                     // #@# rules
                     cssExceptions.push(item);
-                } else if (item.action.type == 'ignore-previous-rules' && 
-                    (ruleText && ruleText.indexOf('generichide') > 0)) {
+                } else if (item.action.type == 'ignore-previous-rules' &&
+                    this.AGRuleConverter._isContentType(agRule, adguard.rules.UrlFilterRule.contentTypes.GENERICHIDE)) {
                     contentBlocker.cssBlockingGenericHideExceptions.push(item);
-                } else if (item.action.type == 'ignore-previous-rules' && 
-                        (item.trigger["resource-type"] && 
-                        item.trigger["resource-type"].length > 0 &&
-                        item.trigger["resource-type"][0] == 'document')) {
+                } else if (item.action.type == 'ignore-previous-rules' &&
+                    this.AGRuleConverter._isContentType(agRule, adguard.rules.UrlFilterRule.contentTypes.ELEMHIDE)) {
                     // elemhide rules
                     contentBlocker.cssElemhide.push(item);
                 } else {

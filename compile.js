@@ -20,6 +20,7 @@ concat([
     './download/rules.js',
     './download/local-script-rules.js',
     './download/simple-regex.js',
+    './browser-utils.js',
     './download/base-filter-rule.js',
     './download/filter-rule-builder.js',
     './download/css-filter-rule.js',
