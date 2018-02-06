@@ -7,7 +7,7 @@ So this utility scripts will donwload required files from AdguardBrowserExtensio
 
 - Node 
 - NPM
-- concat-files (npm install concat-files)
+- concat-files (`npm install concat-files`)
 
 ### Building
 
