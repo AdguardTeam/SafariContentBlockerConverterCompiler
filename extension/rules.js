@@ -16,15 +16,12 @@
  */
 
 /**
- * Extension global preferences
+ * Namespace for adguard rules classes and utils
  */
+adguard.rules = (function () {
 
-adguard.prefs = (function (adguard) {
-    var Prefs = {
-        speedupStartup: function () {
-            return false;
-        }
-    };
+    'use strict';
 
-    return Prefs;
-})(adguard);
+    return {};
+
+})();

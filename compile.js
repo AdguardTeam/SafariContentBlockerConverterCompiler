@@ -1,34 +1,36 @@
-Array.prototype.each = Array.prototype.forEach;
+const fs = require('fs');
 
-// var NodeUglifier = require("node-uglifier");
-// var nodeUglifier = new NodeUglifier("./JSConverter.js");
-// nodeUglifier.merge();//.uglify();
-// //nodeUglifier..uglify();
-//
-// //exporting
-// nodeUglifier.exportToFile("./compiled/JSConverter.js");
+const files = [
+    './extension/adguard.js',
+    './stubs/prefs.js',
+    './extension/punycode.js',
+    './extension/common.js',
+    './extension/url.js',
+    './extension/log.js',
+    './extension/rules.js',
+    './extension/local-script-rules.js',
+    './extension/simple-regex.js',
+    './stubs/browser-utils.js',
+    './stubs/csp-filter.js',
+    './extension/base-filter-rule.js',
+    './extension/filter-rule-builder.js',
+    './extension/css-filter-rule.js',
+    './extension/script-filter-rule.js',
+    './extension/url-filter-rule.js',
+    './extension/converter.js'
+];
 
-var concat = require('concat-files');
+let dependenciesContent = "";
+for (let i = 0; i < files.length; i++) {
+    
+    let fileContent = fs.readFileSync(files[i]).toString();
+    dependenciesContent += fileContent + "\n";
+}
 
-concat([
-    './download/adguard.js',
-    './prefs.js',
-    './download/punycode.js',
-    './download/common.js',
-    './download/url.js',
-    './download/log.js',
-    './download/rules.js',
-    './download/local-script-rules.js',
-    './download/simple-regex.js',
-    './browser-utils.js',
-    './download/base-filter-rule.js',
-    './download/filter-rule-builder.js',
-    './download/css-filter-rule.js',
-    './download/script-filter-rule.js',
-    './download/url-filter-rule.js',
-    './download/converter.js',
-    './JSConverter.js'
-], './compiled/JSConverter.js', function (err) {
-    if (err) throw err;
-    console.log('done');
-});
+let template = fs.readFileSync("JSConverter.template.js").toString();
+
+let placeholder = "/* DEPENDENCIES_CONTENT_PLACEHOLDER */";
+// Using this to avoid patterns: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#Specifying_a_string_as_a_parameter
+let converter = template.split(placeholder).join(dependenciesContent);
+
+fs.writeFileSync("./compiled/JSConverter.js", converter);

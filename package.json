@@ -1,0 +1,15 @@
+{
+  "name": "safari-cb-converter-compiler",
+  "version": "2.0.0",
+  "description": "Compiles a content blocker compiler to be used on iOS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concat-files": "^0.1.1",
+    "download-file-sync": "^1.0.4"
+  }
+}

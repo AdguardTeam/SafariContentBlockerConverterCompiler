@@ -1,7 +1,8 @@
+.DS_Store
 .idea/
 .vscode/
 .jshintrc
 *.iml
 tags
 node_modules
-download/
+blocklist.json
