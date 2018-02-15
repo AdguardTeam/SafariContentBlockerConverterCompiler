@@ -1,4 +1,10 @@
 /**
+ * AdGuard -> Safari Content Blocker converter
+ * Version 2.0.1
+ * License: https://github.com/AdguardTeam/SafariContentBlockerConverterCompiler/blob/master/LICENSE
+ */
+
+/**
 * The main conversion function that is called from the iOS app
 * 
 * @param {} rules Rules to convert
@@ -7,23 +13,10 @@
 */
 var jsonFromFilters = (function () {
 
-    /**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Start of the dependencies content 
  */
-
+/** start of adguard.js */
 /**
  * Global adguard object
  */
@@ -105,10 +98,8 @@ var adguard = (function () { // jshint ignore:line
     };
 
 })();
-/**
- * Extension global preferences stub
- */
-
+/** end of adguard.js */
+/** start of prefs.js */
 adguard.prefs = (function (adguard) {
     var Prefs = {
         speedupStartup: function () {
@@ -118,11 +109,8 @@ adguard.prefs = (function (adguard) {
 
     return Prefs;
 })(adguard);
-
-/**
- * Patched: changed the way punycode is exposed, removed AMD/exports
- */
-
+/** end of prefs.js */
+/** start of punycode.js */
 /*! http://mths.be/punycode v1.3.0 by @mathias */
 ;(function(root) {
 
@@ -611,23 +599,8 @@ adguard.prefs = (function (adguard) {
     // Changed the way punycode is exposed
 	root.punycode = punycode;
 }(window));
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of punycode.js */
+/** start of common.js */
 /**
  * Request types enumeration
  */
@@ -1399,23 +1372,8 @@ adguard.utils.RingBuffer = function (size) { // jshint ignore:line
     };
 
 };
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of common.js */
+/** start of url.js */
 (function (api, global) {
 
     /**
@@ -7635,26 +7593,8 @@ adguard.utils.RingBuffer = function (size) { // jshint ignore:line
     api.url = UrlUtils;
 
 })(adguard.utils, window);
-
-
-
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of url.js */
+/** start of log.js */
 /**
  * Simple logger with log levels
  */
@@ -7732,23 +7672,8 @@ adguard.console = (function () {
         }
     };
 })();
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of log.js */
+/** start of rules.js */
 /**
  * Namespace for adguard rules classes and utils
  */
@@ -7759,23 +7684,8 @@ adguard.rules = (function () {
     return {};
 
 })();
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of rules.js */
+/** start of local-script-rules.js */
 /**
  * By the rules of AMO and addons.opera.com we cannot use remote scripts
  * (and our JS injection rules could be counted as remote scripts).
@@ -7828,23 +7738,8 @@ adguard.rules = (function () {
     };
 
 })(adguard.rules);
-
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
+/** end of local-script-rules.js */
+/** start of simple-regex.js */
 (function (api) {
 
     'use strict';
@@ -7971,10 +7866,8 @@ adguard.rules = (function () {
     api.SimpleRegex = SimpleRegex;
 
 })(adguard.rules);
-
-/**
- * Browser utils stub
- */
+/** end of simple-regex.js */
+/** start of browser-utils.js */
 (function (adguard, api) {
     var Utils = {
         isFirefoxBrowser: function () {
@@ -7988,29 +7881,12 @@ adguard.rules = (function () {
     api.browser = Utils;
 
 })(adguard, adguard.utils);
-/**
- * CSP filter stub
- */
-
+/** end of browser-utils.js */
+/** start of csp-filter.js */
 adguard.rules.CspFilter = adguard.rules.CspFilter || {};
 adguard.rules.CspFilter.DEFAULT_DIRECTIVE = 'connect-src http: https:; frame-src http: https:; child-src http: https:';
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of csp-filter.js */
+/** start of base-filter-rule.js */
 (function (adguard, api) {
 
     'use strict';
@@ -8249,24 +8125,8 @@ adguard.rules.CspFilter.DEFAULT_DIRECTIVE = 'connect-src http: https:; frame-src
     api.FilterRule = FilterRule;
 
 })(adguard, adguard.rules);
-
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of base-filter-rule.js */
+/** start of filter-rule-builder.js */
 (function (adguard, api) {
 
     'use strict';
@@ -8325,24 +8185,8 @@ adguard.rules.CspFilter.DEFAULT_DIRECTIVE = 'connect-src http: https:; frame-src
     };
 
 })(adguard, adguard.rules);
-
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of filter-rule-builder.js */
+/** start of css-filter-rule.js */
 (function (adguard, api) {
 
     'use strict';
@@ -8535,24 +8379,8 @@ adguard.rules.CspFilter.DEFAULT_DIRECTIVE = 'connect-src http: https:; frame-src
     api.CssFilterRule = CssFilterRule;
 
 })(adguard, adguard.rules);
-
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of css-filter-rule.js */
+/** start of script-filter-rule.js */
 (function (adguard, api) {
 
     'use strict';
@@ -8600,25 +8428,8 @@ adguard.rules.CspFilter.DEFAULT_DIRECTIVE = 'connect-src http: https:; frame-src
     api.ScriptFilterRule = ScriptFilterRule;
 
 })(adguard, adguard.rules);
-
-
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of script-filter-rule.js */
+/** start of url-filter-rule.js */
 (function (adguard, api) {
 
     'use strict';
@@ -9701,24 +9512,8 @@ adguard.rules.CspFilter.DEFAULT_DIRECTIVE = 'connect-src http: https:; frame-src
     api.UrlFilterRule = UrlFilterRule;
 
 })(adguard, adguard.rules);
-
-/**
- * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
- *
- * Adguard Browser Extension is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Adguard Browser Extension is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Adguard Browser Extension.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+/** end of url-filter-rule.js */
+/** start of converter.js */
 /**
  * Converts URLs in the AdGuard format to the format supported by Safari
  * https://webkit.org/blog/3476/content-blockers-first-look/
@@ -10693,7 +10488,11 @@ var SafariContentBlockerConverter = (function () {
         convertArray: convertArray
     }
 })();
+/** end of converter.js */
 
+/**
+ * End of the dependencies content 
+ */
 
     return function (rules, limit, optimize) {
         try {
