@@ -1,6 +1,6 @@
 /**
  * AdGuard -> Safari Content Blocker converter
- * Version 2.0.1
+ * Version 2.0.2
  * License: https://github.com/AdguardTeam/SafariContentBlockerConverterCompiler/blob/master/LICENSE
  */
 
@@ -643,6 +643,7 @@ adguard.utils = (function () {
         browser: null, // BrowserUtils
         filters: null, // FilterUtils,
         workaround: null, // WorkaroundUtils
+        i18n: null, // I18nUtils
         StopWatch: null,
         Promise: null // Deferred,
     };
@@ -1222,6 +1223,61 @@ adguard.utils = (function () {
     };
 
     api.workaround = WorkaroundUtils;
+
+})(adguard.utils);
+
+/**
+ * Simple i18n utils
+ */
+(function (api) {
+
+    function isArrayElement(array, elem) {
+        return array.indexOf(elem) >= 0;
+    }
+
+    function isObjectKey(object, key) {
+        return key in object;
+    }
+
+    api.i18n = {
+
+        /**
+         * Tries to find locale in the given collection of locales
+         * @param locales Collection of locales (array or object)
+         * @param locale Locale (e.g. en, en_GB, pt_BR)
+         * @returns matched locale from the locales collection or null
+         */
+        normalize: function (locales, locale) {
+
+            if (!locale) {
+                return null;
+            }
+
+            // Transform Language-Country => Language_Country
+            locale = locale.replace("-", "_");
+
+            var search;
+
+            if (api.collections.isArray(locales)) {
+                search = isArrayElement;
+            } else {
+                search = isObjectKey;
+            }
+
+            if (search(locales, locale)) {
+                return locale;
+            }
+
+            // Try to search by the language
+            var parts = locale.split('_');
+            var language = parts[0];
+            if (search(locales, language)) {
+                return language;
+            }
+
+            return null;
+        }
+    };
 
 })(adguard.utils);
 
@@ -9523,7 +9579,7 @@ var SafariContentBlockerConverter = (function () {
     /**
      * Safari content blocking format rules converter.
      */
-    var CONVERTER_VERSION = '2.0.0';
+    var CONVERTER_VERSION = '2.0.2';
     // Max number of CSS selectors per rule (look at compactCssRules function)
     var MAX_SELECTORS_PER_WIDE_RULE = 250;
 
@@ -9641,35 +9697,35 @@ var SafariContentBlockerConverter = (function () {
         var addResourceType = function (rule, result) {
             var types = [];
 
-            var UrlFilterRule = adguard.rules.UrlFilterRule;
+            var contentTypes = adguard.rules.UrlFilterRule.contentTypes;
 
-            if (rule.permittedContentType === UrlFilterRule.contentTypes.ALL &&
+            if (rule.permittedContentType === contentTypes.ALL &&
                 rule.restrictedContentType === 0) {
                 // Safari does not support all other default content types, like subdocument etc.
                 // So we can use default safari content types instead.
                 return;
             }
-            if (hasContentType(rule, UrlFilterRule.contentTypes.IMAGE)) {
+            if (hasContentType(rule, contentTypes.IMAGE)) {
                 types.push("image");
             }
-            if (hasContentType(rule, UrlFilterRule.contentTypes.STYLESHEET)) {
+            if (hasContentType(rule, contentTypes.STYLESHEET)) {
                 types.push("style-sheet");
             }
-            if (hasContentType(rule, UrlFilterRule.contentTypes.SCRIPT)) {
+            if (hasContentType(rule, contentTypes.SCRIPT)) {
                 types.push("script");
             }
-            if (hasContentType(rule, UrlFilterRule.contentTypes.MEDIA)) {
+            if (hasContentType(rule, contentTypes.MEDIA)) {
                 types.push("media");
             }
-            if (hasContentType(rule, UrlFilterRule.contentTypes.XMLHTTPREQUEST) ||
-                hasContentType(rule, UrlFilterRule.contentTypes.OTHER) ||
-                hasContentType(rule, UrlFilterRule.contentTypes.WEBSOCKET)) {
+            if (hasContentType(rule, contentTypes.XMLHTTPREQUEST) ||
+                hasContentType(rule, contentTypes.OTHER) ||
+                hasContentType(rule, contentTypes.WEBSOCKET)) {
                 types.push("raw");
             }
-            if (hasContentType(rule, UrlFilterRule.contentTypes.FONT)) {
+            if (hasContentType(rule, contentTypes.FONT)) {
                 types.push("font");
             }
-            if (hasContentType(rule, UrlFilterRule.contentTypes.SUBDOCUMENT)) {
+            if (hasContentType(rule, contentTypes.SUBDOCUMENT)) {
                 types.push("document");
             }
             if (rule.isBlockPopups()) {
@@ -9678,16 +9734,16 @@ var SafariContentBlockerConverter = (function () {
             }
 
             // Not supported modificators
-            if (isContentType(rule, UrlFilterRule.contentTypes.OBJECT)) {
+            if (isContentType(rule, contentTypes.OBJECT)) {
                 throw new Error('$object content type is not yet supported');
             }
-            if (isContentType(rule, UrlFilterRule.contentTypes.OBJECT_SUBREQUEST)) {
+            if (isContentType(rule, contentTypes.OBJECT_SUBREQUEST)) {
                 throw new Error('$object_subrequest content type is not yet supported');
             }
-            if (isContentType(rule, UrlFilterRule.contentTypes.WEBRTC)) {
+            if (isContentType(rule, contentTypes.WEBRTC)) {
                 throw new Error('$webrtc content type is not yet supported');
             }
-            if (isSingleOption(rule, UrlFilterRule.options.JSINJECT)) {
+            if (isSingleOption(rule, adguard.rules.UrlFilterRule.options.JSINJECT)) {
                 throw new Error('$jsinject rules are ignored.');
             }
             if (rule.getReplace()) {
@@ -9709,11 +9765,11 @@ var SafariContentBlockerConverter = (function () {
          */
         var createUrlFilterString = function (filter) {
             var urlRuleText = filter.getUrlRuleText();
+            var isWebSocket = (filter.permittedContentType === adguard.rules.UrlFilterRule.contentTypes.WEBSOCKET);
+
+            // Use a single standard regex for rules that are supposed to match every URL 
             if (ANY_URL_TEMPLATES.indexOf(urlRuleText) >= 0) {
-                if (adguard.rules.UrlFilterRule.contentTypes.WEBSOCKET === filter.permittedContentType) {
-                    return URL_FILTER_WS_ANY_URL;
-                }
-                return URL_FILTER_ANY_URL;
+                return isWebSocket ? URL_FILTER_WS_ANY_URL : URL_FILTER_ANY_URL;
             }
 
             if (filter.isRegexRule && filter.urlRegExp) {
@@ -9725,6 +9781,14 @@ var SafariContentBlockerConverter = (function () {
             if (!urlRegExpSource) {
                 // Rule with empty regexp
                 return URL_FILTER_ANY_URL;
+            }
+
+            // Prepending WebSocket protocol to resolve this:
+            // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/957
+            if (isWebSocket &&
+                !urlRegExpSource.startsWith("^") &&
+                !urlRegExpSource.startsWith("ws")) {
+                return URL_FILTER_WS_ANY_URL + ".*" + urlRegExpSource;
             }
 
             return urlRegExpSource;
